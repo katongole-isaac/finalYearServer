@@ -21,7 +21,7 @@ const agencySchema = new mongoose.Schema({
 	email: { type: String, minlength: 5, maxlength: 255, required: true },
 	password: { type: String, maxlength: 1024, required: true },
 	phone: { type: String, minlength: 10, maxlength: 20, required: true },
-	createdAt: { type: Date, default: Date.now },
+	createdAt: { type: Number, default: Date.now() },
 	status: { type: String, default: "Active" },
 });
 
@@ -50,7 +50,6 @@ function validateAgency(agency) {
 			.max(20)
 			.required(),
 		location: Joi.string().min(3).max(40).required(),
-		
 	});
 	return schema.validate(agency);
 }

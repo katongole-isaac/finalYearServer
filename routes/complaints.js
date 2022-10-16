@@ -8,7 +8,26 @@ const { User } = require("../models/userSchema");
 
 const router = express.Router();
 
-//Getting complaints of a specific email addr
+//getting complaints by searchTerm ===> Used by Agency
+router.get("/search", async (req, res) => {
+	const complaints = await Complaint.find({ fullname: "" }).sort(
+		"fullname"
+	);
+
+	res.status(200).json({ res: complaints });
+});
+
+
+//Getting complaints for an agency. used by an agency
+router.get("/agency/views", auth, async (req, res) => {
+	const complaints = await Complaint.find({ agency: req.query.agency })
+		.select("-__v")
+		.sort("date");
+
+	res.status(200).json({ res: complaints });
+});
+
+//Getting complaints of a specific email addr. Used by a specific user (migrant).
 router.get("/views", auth, async (req, res) => {
 	const complaints = await Complaint.find({ email: req.query.email })
 		.select("-__v")
@@ -17,7 +36,7 @@ router.get("/views", auth, async (req, res) => {
 	res.status(200).json({ res: complaints });
 });
 
-//Getting a specific complaint by its id
+//Getting a specific complaint by its id. This route is used by agencies to view details for a specific complaint
 router.get("/views/:id", auth, async (req, res) => {
 	let proPic_url, user;
 	const { error } = validateId({ id: req.params.id }); //checking for valid Ids
@@ -43,7 +62,7 @@ router.get("/views/:id", auth, async (req, res) => {
 	res.status(200).json({ res: complaint, profilePic: proPic_url });
 });
 
-//Getting all complaints
+//Getting all complaints . Viewing all complaints
 router.get("/view/all", auth, async (req, res) => {
 	const complaints = await Complaint.find({}).select("-__v").sort("date");
 
@@ -53,7 +72,7 @@ router.get("/view/all", auth, async (req, res) => {
 	res.status(200).json({ res: complaints });
 });
 
-//uploading content of a complaint.
+//uploading content of a complaint. Used by migrant to post a complaint
 router.post("/", auth, upload.any(), validateReqBody, async (req, res) => {
 	let audioUrl = "";
 	let videoUrl = "";
@@ -71,8 +90,9 @@ router.post("/", auth, upload.any(), validateReqBody, async (req, res) => {
 		return res.status(400).json({ error: "No Allowed to post a complaint" });
 
 	const desc = req.body?.desc;
-	const { fullname, email, reason } = req.body;
+	const { fullname, email, reason, agency } = req.body;
 	const complaint = new Complaint({
+		agency,
 		fullname,
 		email,
 		reason,
@@ -87,6 +107,54 @@ router.post("/", auth, upload.any(), validateReqBody, async (req, res) => {
 
 	console.log(complaint);
 	res.status(200).json(complaint);
+});
+
+//Updating the viewed status of the complaint.
+//Here the complaint status changes to "seen"
+router.put("/updateview", async (req, res) => {
+	const { error } = validateId({ id: req.body.id });
+	if (error)
+		return res
+			.status(400)
+			.json({ error: `Invalid complaint Id provided ${req.body.id}` });
+
+	const complaint = await Complaint.findByIdAndUpdate(
+		{ _id: req.body.id },
+		{
+			$set: {
+				viewed: req.body.viewed,
+				status: req.body.status,
+			},
+		},
+		{
+			new: true,
+		}
+	);
+	res.status(200).json({ id: complaint._id, viewed: complaint.viewed });
+});
+
+//agency adding a comment
+router.put("/comment", async (req, res) => {
+	const { error } = validateId({ id: req.body.id });
+	console.log(req.body.comment);
+	if (error)
+		return res
+			.status(400)
+			.json({ error: `Invalid complaint Id provided ${req.body.id}` });
+
+	const complaint = await Complaint.findByIdAndUpdate(
+		{ _id: req.body.id },
+		{
+			$set: {
+				comment: req.body.comment,
+				commentDate: Date.now(),
+			},
+		},
+		{
+			new: true,
+		}
+	);
+	res.status(200).json({ id: complaint._id, comment: complaint.comment });
 });
 
 module.exports = router;

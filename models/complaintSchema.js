@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-const dateNow = Date.now();
 const complaintSchema = new mongoose.Schema({
 	userId: { type: mongoose.Schema.Types.ObjectId },
 	fullname: { type: String, minlength: 3, maxlength: 255, required: true },
@@ -9,9 +8,17 @@ const complaintSchema = new mongoose.Schema({
 	reason: { type: String, minlength: 5, maxlength: 255, required: true },
 	date: { type: String, default: Date.now },
 	desc: { type: String },
-	sent: { type: Date, default: Date.now },
+	sent: { type: String, default: Date.now },
+	viewed: { type: String, default: "new" },
 	videoUrl: { type: String },
 	audioUrl: { type: String },
+	comment: { type: String, default: "" },
+	commentDate: { type: Number, default: Date.now },
+	status: { type: String, default: "pending" }, // status: [pending, seen, worked-upon , forwaring to ministry, ]
+	agency: { type: String, required: true },
+	attachedFiles: {
+		type: Array,
+	},
 });
 
 const Complaint = mongoose.model("complaint", complaintSchema);
@@ -24,6 +31,7 @@ function validateComplaint(complaint) {
 	const schema = Joi.object({
 		fullname: Joi.string().min(3).max(255).required(),
 		email: Joi.string().min(5).max(255).required(),
+		agency: Joi.string().min(5).max(255).required(),
 		reason: Joi.string().min(3).max(255).required(),
 		desc: Joi.string(),
 		id: Joi.objectId().required(),

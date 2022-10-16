@@ -6,6 +6,7 @@ const {auth} = require("../middleware/auth");
 
 //Audio streaming
 router.get("/:id", async (req, res) => {
+	console.log(req.headers);
 	const range = req.headers.range;
 	if (!range) return res.status(400).json({ error: "Range header required" });
 	let audioFile;
@@ -23,7 +24,7 @@ router.get("/:id", async (req, res) => {
 
 	if (!audioFile) return res.status(400).json({ error: "No audio found !!" });
 
-	//const videoContentFile = path.join("../uploads/video", videoFile);
+	// const videoContentFile = path.join("../uploads/video", videoFile);
 	const audioContentSize = fs.statSync(audioFile).size;
 
 	const CHUNK_SIZE = 10 ** 6; // 1MB
@@ -35,13 +36,13 @@ router.get("/:id", async (req, res) => {
 	const headers = {
 		"Content-Range": `bytes ${start}-${end}/${audioContentSize}`,
 		"Accept-Ranges": "bytes",
-		"Content-Length": contentLength,
+		"Content-Length": audioContentSize,
 		"Content-Type": "audio/webm",
 	};
 
 	res.writeHead(206, headers);
 
-	const audioStream = fs.createReadStream(audioFile, { start, end });
+	const audioStream = fs.createReadStream(audioFile);
 	audioStream.pipe(res);
 });
 

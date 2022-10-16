@@ -1,6 +1,7 @@
 const express = require("express");
 const Joi = require("joi");
 const { auth } = require("../middleware/auth");
+const { isAdmin } = require("../middleware/isAdmin");
 const { validateId } = require("../middleware/validateId");
 const { AgencyModel } = require("../models/agencySchema");
 
@@ -8,7 +9,7 @@ const router = express.Router();
 
 router.get("/");
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/update/:id", auth, async (req, res) => {
 	const { error } = validateId({ id: req.params.id }); //checking for valid Ids
 	if (error) return res.status(400).json({ error: "Invalid Id" });
 
@@ -31,6 +32,17 @@ router.put("/:id", auth, async (req, res) => {
 
 	console.log(newAgency);
 	res.status(200).json({ success: true, result: newAgency._id });
+});
+
+//used by ministry to delete agency acc
+router.delete("/delete", [auth, isAdmin], async (req, res) => {
+	const { error } = validateId({ id: req.body.id }); //checking for valid Ids
+	if (error) return res.status(400).json({ error: "Invalid Id" });
+
+	const user = await AgencyModel.findByIdAndDelete(req.body.id);
+	if (!user) return res.status(404).json({ error: "No user found !" });
+
+	res.status(200).json({ id: user._id });
 });
 
 module.exports = router;

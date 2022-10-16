@@ -5,7 +5,7 @@ const config = require("config");
 
 const userSchema = new mongoose.Schema({
 	firstname: {
-		type: String,
+		type: String, 
 		minlength: 3,
 		maxlength: 255,
 		required: true,
