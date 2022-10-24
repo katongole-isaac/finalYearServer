@@ -25,6 +25,7 @@ router.post("/", async (req, res) => {
 		phone: _phone,
 		passport: _passport,
 		agency: agencyName,
+		gender: userGender
 	} = req.body;
 
 	const user = await User.findOne({ email: _email });
@@ -47,6 +48,7 @@ router.post("/", async (req, res) => {
 			_id: agency._id,
 			name: agency.name,
 		},
+		gender: userGender
 	});
 
 	await newUser.save();
@@ -63,6 +65,7 @@ router.post("/", async (req, res) => {
 		_id,
 		agency: myAgency,
 		accountStatus,
+		gender
 	} = newUser;
 	res.cookie("x-auth-token", token, { maxAge, httpOnly: true });
 	res.status(201).json({
@@ -75,6 +78,7 @@ router.post("/", async (req, res) => {
 		passport,
 		profilePic,
 		myAgency,
+		gender,
 		status: accountStatus,
 	});
 });
