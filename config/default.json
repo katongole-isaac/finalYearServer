@@ -1,4 +1,4 @@
 {
-	"app_db": "mongodb://localhost:27017/finalProject",
+	"app_db": "mongodb://localhost:27017/finalProject?replicaSet=rs0",
 	"appSecretKey": "encryptionKey"
 }

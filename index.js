@@ -6,7 +6,6 @@ const config = require("config");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const path = require("path");
-const autoInc = require("mongoose-auto-increment");
 const createUserRouter = require("./routes/signup");
 const userAuthRouter = require("./routes/login");
 const agencySignupRouter = require("./routes/agencySignup");
@@ -31,14 +30,14 @@ const viewLetterRouter = require("./routes/viewLetter");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-
-
 mongoose
   .connect(config.get("app_db"))
   .then((dbConnection) => {
     console.log("connected to DB...");
   })
   .catch((ex) => console.log(ex));
+
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
