@@ -39,10 +39,10 @@ router.delete("/delete", [auth, isAdmin], async (req, res) => {
   const { error } = validateId({ id: req.body.id }); //checking for valid Ids
   if (error) return res.status(400).json({ error: "Invalid Id" });
 
-  // const user = await AgencyModel.findByIdAndDelete(req.body.id);
-  // if (!user) return res.status(404).json({ error: "No user found !" });
+  const user = await AgencyModel.findByIdAndDelete(req.body.id);
+  if (!user) return res.status(404).json({ error: "No user found !" });
 
-  res.status(200).json({ id: req.body.id }); //user._id
+  res.status(200).json({ id: user._id }); //user._id
 });
 
 module.exports = router;

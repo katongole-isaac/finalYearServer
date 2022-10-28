@@ -6,12 +6,12 @@ const { upload } = require("../middleware/_multer");
 const { Complaint } = require("../models/complaintSchema");
 const { User } = require("../models/userSchema");
 
-
 const router = express.Router();
 
 //getting complaints by searchTerm ===> Used by Agency and migrant
 router.get("/search", async (req, res) => {
-  //Performing a text search, you first create a text Index on the collection you want to search
+  //Performing a text search, you first create a text Index on the collection you want to search.
+  // the search field is already indexed when creating the index in mongodb
   const complaints = await Complaint.find({
     $text: {
       $search: req.query.q,
@@ -20,6 +20,11 @@ router.get("/search", async (req, res) => {
   }).sort("_id");
 
   res.status(200).json({ res: complaints });
+});
+
+//Used by agency to search for complaint by Id (number)
+router.get("/agency/search", async () => {
+  // await Complaint.find({});
 });
 
 //Getting complaints for an agency. used by an agency
@@ -44,10 +49,8 @@ router.get("/views", auth, async (req, res) => {
 router.get("/views/:id", auth, async (req, res) => {
   let proPic_url, user;
   const { error } = validateId({ id: req.params.id }); //checking for valid Ids
-  if (error)
-    return res
-      .status(400)
-      .json({ error: `Invalid complaint Id provided ${req.params.id}` });
+  if (!req.params.id)
+    return res.status(400).json({ error: `No complaint Id provided` });
 
   const complaint = await Complaint.findById(req.params.id)
     .select("-__v")
@@ -58,10 +61,8 @@ router.get("/views/:id", auth, async (req, res) => {
       .status(404)
       .json({ error: `No complaint with id ${req.params.id}` });
 
-  if (complaint?.userId) {
-    user = await User.findById({ _id: complaint.userId });
-    proPic_url = user.profilePic;
-  } else proPic_url = "";
+  user = await User.findById({ _id: complaint.userId });
+  proPic_url = user?.profilePic || "";
 
   res.status(200).json({ res: complaint, profilePic: proPic_url });
 });
