@@ -21,7 +21,7 @@ const agencySchema = new mongoose.Schema({
 	email: { type: String, minlength: 5, maxlength: 255, required: true },
 	password: { type: String, maxlength: 1024, required: true },
 	phone: { type: String, minlength: 10, maxlength: 20, required: true },
-	createdAt: { type: Number, default: Date.now() },
+	createdAt: { type: Number, default: Date.now() , immutable: true },
 	status: { type: String, default: "Active" },
 });
 

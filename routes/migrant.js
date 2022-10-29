@@ -92,7 +92,7 @@ router.put("/accounts/update/:id", auth, async (req, res) => {
             new: true,
             session,
           }
-        );
+        ).select("-password -__v -_id");
         newComplaintEmail = await Complaint.findOneAndUpdate(
           { email: oldEmail },
           { $set: { email: newUser.email } },
@@ -105,7 +105,7 @@ router.put("/accounts/update/:id", auth, async (req, res) => {
         session.endSession();
       })
       .then(() => {
-        res.status(200).json({ success: true, result: newUser._id });
+        res.status(200).json({ success: true, result: newUser });
       });
   } catch (ex) {
     console.log(ex);
