@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const autoIncrement = require("mongoose-auto-increment");
 const config = require("config");
+const { Comment } = require("./comments");
 
 const dbConnection = mongoose.createConnection(config.get("app_db"));
 autoIncrement.initialize(dbConnection);
@@ -17,8 +18,7 @@ const complaintSchema = new mongoose.Schema({
   viewed: { type: String, default: "new" },
   videoUrl: { type: String },
   audioUrl: { type: String },
-  comment: { type: String, default: "" },
-  commentDate: { type: Number },
+  // comments: [new Comment ],
   status: { type: String, default: "pending" }, // status: [pending, seen, worked-upon , forwaring to ministry, ]
   agency: { type: String, required: true },
   attachedFiles: {
