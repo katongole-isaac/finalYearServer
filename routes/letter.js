@@ -74,7 +74,7 @@ router.post("/post", auth, (req, res) => {
       }
     );
 
-    if (!complaint)
+    if (!complaint)  
       return res
         .status(404)
         .json({ error: `No complaint with the id: ${req.body.id}` });
@@ -83,6 +83,7 @@ router.post("/post", auth, (req, res) => {
       from: agency.name,
       letters: [req.file.path],
       migrantName: complaint.fullname,
+      complaintId: id,
     });
 
     letter = await letter.save();

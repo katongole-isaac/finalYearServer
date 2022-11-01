@@ -167,7 +167,7 @@ function validatePassUpdate(body) {
 
 function validateUserUpdate(user) {
   const schema = Joi.object({
-    id: Joi.objectId().required(),
+    _id: Joi.objectId().required(),
     firstname: Joi.string().min(3).max(40).required(),
     lastname: Joi.string().min(3).max(40).required(),
     email: Joi.string().email().required(),
@@ -177,6 +177,7 @@ function validateUserUpdate(user) {
       .max(20)
       .required(),
     agency: Joi.object(),
+    gender: Joi.string(),
     accountStatus: Joi.string(),
   });
 

@@ -152,7 +152,7 @@ router.put("/updateview", async (req, res) => {
 router.post("/comment", async (req, res) => {
   console.log(req.body);
   const { error } = validateComment(req.body);
-  if (error) return res.status(400).json({ error: `Invalid complaint format` });
+  if (error) return res.status(400).json({ error: `Invalid complaint format, ${error.details[0].message}` });
 
   let comment = await Comment.findOneAndUpdate(
     { complaintId: req.body.id },

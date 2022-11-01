@@ -18,6 +18,7 @@ const letterSchema = new mongoose.Schema({
     lowercase: true,
   },
   createdAt: { type: String, default: Date.now },
+  complaintId: { type: Number, required: true },
   letters: { type: Array },
   viewed: {
     type: Boolean,
