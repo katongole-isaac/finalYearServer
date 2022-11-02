@@ -54,13 +54,15 @@ router.post("/", async (req, res) => {
   }
 
   if (!user) {
-    logger.error(`"Invalid email or password"`);
+    logger.error(` {${email}} "Invalid email or password"`);
     return res.status(400).json({ message: "Invalid email or password" });
   }
 
   const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword)
+  if (!validPassword) {
+    logger.info("Invalid email or password");
     return res.status(400).json({ message: "Invalid email or password" });
+  }
 
   const maxAge = 7 * 24 * 60 * 60 * 1000; // 'expires in 7days'
   const token = user.genAuthToken();
@@ -80,6 +82,7 @@ router.post("/", async (req, res) => {
       accountStatus,
       gender,
     } = user;
+    logger.info(`${firstname}_${lastname} account has loggined in !!!`);
     res.status(200).json({
       message: "logged in",
       user: _id,
@@ -98,6 +101,7 @@ router.post("/", async (req, res) => {
   }
   if (accType === "ministry") {
     const { _id, username, email, phone } = user;
+    logger.info(`Ministry account has loggined in !!!`);
     res
       .status(200)
       .json({ message: "logged in", user: _id, token, username, email, phone });
@@ -105,6 +109,8 @@ router.post("/", async (req, res) => {
 
   if (accType === "agency") {
     const { _id, name, email, status, createdAt, phone, location } = user;
+    logger.info(` Agency [${name}] account has loggined in !!!`);
+
     res.status(200).json({
       user: _id,
       name,

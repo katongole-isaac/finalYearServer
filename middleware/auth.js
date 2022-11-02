@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const { User } = require("../models/userSchema");
+const { logger } = require("../logger");
 
 //Authenticating users.
 module.exports.auth = async function (req, res, next) {
@@ -12,7 +13,7 @@ module.exports.auth = async function (req, res, next) {
 		req.user = decoded;
 		next();
 	} catch (ex) {
-		console.log("Error: => ", ex);
+		logger.error(`Error : ${ex}`)
 		return res.status(400).json({ error: "Invalid token" });
 	}
 };

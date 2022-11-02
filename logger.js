@@ -12,9 +12,9 @@ const customMyFormat = combine(
     ({ level, timestamp, message }) =>
       `${new Date(
         timestamp
-      ).toLocaleString()} [${level.toUpperCase()}] ${message} `
+      ).toString()} [${level.toUpperCase()}] ${message} `  
   )
-);
+); 
 
 const logger = winston.createLogger({
   format: customMyFormat,
