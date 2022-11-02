@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const { MinistryModel } = require("../models/ministrySchema");
 const { AgencyModel } = require("../models/agencySchema");
 const { Complaint } = require("../models/complaintSchema");
+const winston = require("winston");
+const { logger } = require("../logger");
 
 const router = express.Router();
 
@@ -51,8 +53,10 @@ router.post("/", async (req, res) => {
     }
   }
 
-  if (!user)
+  if (!user) {
+    logger.error(`"Invalid email or password"`);
     return res.status(400).json({ message: "Invalid email or password" });
+  }
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword)

@@ -14,13 +14,25 @@ const router = express.Router();
 router.get("/search", async (req, res) => {
   //Performing a text search, you first create a text Index on the collection you want to search.
   // the search field is already indexed when creating the index in mongodb
-  const complaints = await Complaint.find({
-    $text: {
-      $search: req.query.q,
-      $caseSensitive: false,
-    },
-    email: req.query.email,
-  }).sort("_id");
+  let complaints;
+  //if its an agency search user this else use otherwise
+  if (req.query.agencyName) {
+    complaints = await Complaint.find({
+      $text: {
+        $search: req.query.q,
+        $caseSensitive: false,
+      },
+      agency: req.query.agencyName,
+    }).sort("_id");
+  } else if (req.query.email) {
+    complaints = await Complaint.find({
+      $text: {
+        $search: req.query.q,
+        $caseSensitive: false,
+      },
+      email: req.query.email,
+    }).sort("_id");
+  }
 
   res.status(200).json({ res: complaints });
 });
@@ -59,7 +71,6 @@ router.get("/view/all", auth, async (req, res) => {
   res.status(200).json({ res: complaints });
 });
 
-
 //Getting a specific complaint by its id. This route is used by agencies to view details for a specific complaint
 router.get("/views/:id", auth, async (req, res) => {
   let proPic_url, user;
@@ -85,7 +96,6 @@ router.get("/views/:id", auth, async (req, res) => {
 
   res.status(200).json({ res: complaint, profilePic: proPic_url, comments });
 });
-
 
 //uploading content of a complaint. Used by migrant to post a complaint
 router.post("/", auth, upload.any(), validateReqBody, async (req, res) => {
@@ -152,7 +162,10 @@ router.put("/updateview", async (req, res) => {
 router.post("/comment", async (req, res) => {
   console.log(req.body);
   const { error } = validateComment(req.body);
-  if (error) return res.status(400).json({ error: `Invalid complaint format, ${error.details[0].message}` });
+  if (error)
+    return res
+      .status(400)
+      .json({ error: `Invalid complaint format, ${error.details[0].message}` });
 
   let comment = await Comment.findOneAndUpdate(
     { complaintId: req.body.id },

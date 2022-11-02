@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
+require("express-async-errors");
 const config = require("config");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -26,6 +27,8 @@ const rangeHeader = require("./middleware/rangeHeader");
 const videoRangeHeader = require("./middleware/videoRangeHeader");
 const letterRouter = require("./routes/letter");
 const viewLetterRouter = require("./routes/viewLetter");
+const errorMiddleware = require("./middleware/error");
+const { logger } = require("./logger");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,11 +36,9 @@ const PORT = process.env.PORT || 3001;
 mongoose
   .connect(config.get("app_db"))
   .then((dbConnection) => {
-    console.log("connected to DB...");
+    logger.info(`connected to MongoDB...`);
   })
   .catch((ex) => console.log(ex));
-
-
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -73,7 +74,18 @@ app.use("/api/agency/accounts", agencyAccountsRouter);
 app.use("/api/ministry/signup", ministrySignupRouter);
 app.use("/api/migrant/image/upload", migrantImageUpload);
 app.use("/api/agency/account", agencyUpdateRouter);
+app.use(errorMiddleware); // error middleware should be the last in the request pipeline  ====> you need to require('express-async-errors') for it to work
 
 app.listen(PORT, () => {
-  console.log(`Running on Port ${PORT}`);
+  logger.info(`Running on Port ${PORT}`);
+});
+
+//handling exceptions
+process.on("uncaughtException", (err, origin) => {
+  logger.error(`Uncaught Exception from ${origin} with an error ${err} `);
+});
+
+//occurs when the promise has been rejected and not caught by .catch() 
+process.on("unhandledRejection", (reason, promise) => {
+  logger.error(`'Unhandled Rejection at:', ${promise}, 'reason:', ${reason}`);
 });
