@@ -5,6 +5,6 @@ module.exports.validatePassUpdate = function validatePassUpdate(body) {
     id: Joi.objectId().required(),
     oldPass: Joi.string().required(),
     newPass: Joi.string().required(),
-  });
+  });       
   return schema.validate(body);
 };

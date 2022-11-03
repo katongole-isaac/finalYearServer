@@ -137,11 +137,8 @@ router.post("/", auth, upload.any(), validateReqBody, async (req, res) => {
 //Updating the viewed status of the complaint.
 //Here the complaint status changes to "seen"
 router.put("/updateview", async (req, res) => {
-  const { error } = validateId({ id: req.body.id });
-  if (error)
-    return res
-      .status(400)
-      .json({ error: `Invalid complaint Id provided ${req.body.id}` });
+  if (!req.body.id)
+    return res.status(400).json({ error: `No complaint Id provided ` });
 
   const complaint = await Complaint.findByIdAndUpdate(
     { _id: req.body.id },
