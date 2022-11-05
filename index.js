@@ -28,6 +28,8 @@ const videoRangeHeader = require("./middleware/videoRangeHeader");
 const letterRouter = require("./routes/letter");
 const viewLetterRouter = require("./routes/viewLetter");
 const errorMiddleware = require("./middleware/error");
+const commentsRouter = require("./routes/comments");
+
 const { logger } = require("./logger");
 
 const app = express();
@@ -38,7 +40,10 @@ mongoose
   .then((dbConnection) => {
     logger.info(`connected to MongoDB...`);
   })
-  .catch((ex) => console.log(ex));
+  .catch((ex) => {
+    logger.error(ex);
+    console.log(ex);
+  });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -74,6 +79,7 @@ app.use("/api/agency/accounts", agencyAccountsRouter);
 app.use("/api/ministry/signup", ministrySignupRouter);
 app.use("/api/migrant/image/upload", migrantImageUpload);
 app.use("/api/agency/account", agencyUpdateRouter);
+app.use("/api/comments/", commentsRouter);
 app.use(errorMiddleware); // error middleware should be the last in the request pipeline  ====> you need to require('express-async-errors') for it to work
 
 app.listen(PORT, () => {
@@ -85,7 +91,7 @@ process.on("uncaughtException", (err, origin) => {
   logger.error(`Uncaught Exception from ${origin} with an error ${err} `);
 });
 
-//occurs when the promise has been rejected and not caught by .catch() 
+//occurs when the promise has been rejected and not caught by .catch()
 process.on("unhandledRejection", (reason, promise) => {
   logger.error(`'Unhandled Rejection at:', ${promise}, 'reason:', ${reason}`);
 });

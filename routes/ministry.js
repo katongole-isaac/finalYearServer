@@ -30,6 +30,8 @@ router.get("/", [auth, isAdmin], async (req, res) => {
 
   //getting an agency in the form { agency: 'agencyName', count: 30} ==  for graph in the ministry dashbrd
 
+  if (agenciesNames.length === 0 || agenciesNames === null) return [];
+  
   let agencyStat = [];
   for (let agency of agenciesNames) {
     let complaintsCount = complaintsArray.filter(
@@ -48,6 +50,10 @@ router.get("/", [auth, isAdmin], async (req, res) => {
     workedUponComplaints,
     seenComplaints,
   });
+});
+
+router.get("/", [auth, isAdmin], async (req, res) => {
+  const agenciesNames = await AgencyModel.find({}).sort({ name: 1 });
 });
 
 module.exports = router;

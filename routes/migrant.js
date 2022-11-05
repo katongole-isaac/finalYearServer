@@ -179,6 +179,7 @@ function validateUserUpdate(user) {
     agency: Joi.object(),
     gender: Joi.string(),
     accountStatus: Joi.string(),
+    profilePic: Joi.string(),
   });
 
   return schema.validate(user);
