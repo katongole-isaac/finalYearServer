@@ -81,6 +81,7 @@ router.get("/views/:id", auth, async (req, res) => {
   const complaint = await Complaint.findById(req.params.id)
     .select("-__v")
     .sort("date");
+    
   const comments = await Comment.findOne({ complaintId: req.params.id }).select(
     "-__v"
   ); //comments on the migrant complaint

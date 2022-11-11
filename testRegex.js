@@ -43,3 +43,4 @@
 // };
 
 // console.log(complaintStatusAsPercentage(60, [40, 30, 23]));
+
